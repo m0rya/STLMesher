@@ -34,7 +34,7 @@ void draw() {
 
 
   pushMatrix();
-  translate(width/2, height/2);
+  translate(width/2, height/2, width/2);
   rotateY(radians(frameCount));
   obj.drawObj();
   popMatrix();
@@ -74,7 +74,6 @@ void inputbox(String theString) {
   if (theString.equals("make")) {
     obj.outputSTLFile();
     writer.flush();
-
     exit();
   }
 
@@ -98,6 +97,8 @@ void inputbox(String theString) {
     obj = new Cube(writer, parseInt(objArgments[0]));
   } else if (objName.equals("cone")) {
     obj = new Cone(writer, parseInt(objArgments[0]), parseInt(objArgments[1]), parseInt(objArgments[2]));
+  }else if(objName.equals("BezierSurface")){
+    obj = new BezierSurface(writer, parseInt(objArgments[0]), parseInt(objArgments[1]), parseInt(objArgments[2]), parseInt(objArgments[3]), parseInt(objArgments[4]));
   }
 
   println(objName);

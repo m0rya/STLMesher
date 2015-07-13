@@ -1,8 +1,0 @@
-class Box extends Obj{
-  
-  
-  
-  
-  
-  
-}

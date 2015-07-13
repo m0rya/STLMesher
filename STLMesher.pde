@@ -134,18 +134,6 @@ class Mesher {
 
 
 
-  //=====Object=======
-
-
-
-  //Bezier Surface
-
-
-  //Trigonal Pyramid
-
-
-
-  //Sphere
-  //
+  
 }
 
