@@ -12,7 +12,7 @@ PrintWriter writer;
 void setup() {
 
   size(500, 500, P3D);
-  writer = createWriter("tttttest.stl");
+  writer = createWriter("OUTPUT.stl");
 
 
   cp5 = new ControlP5(this);
@@ -89,6 +89,8 @@ void inputbox(String theString) {
   String argments = theString.substring(s+1, e);
 
   objArgments = argments.split(",");
+  println(objArgments);
+  println(parseInt(objArgments[1]));
 
 
   if (objName.equals("cylindar")) {
@@ -98,7 +100,10 @@ void inputbox(String theString) {
   } else if (objName.equals("cone")) {
     obj = new Cone(writer, parseInt(objArgments[0]), parseInt(objArgments[1]), parseInt(objArgments[2]));
   }else if(objName.equals("BezierSurface")){
+    println(parseInt(objArgments[1]));
+    println(parseInt(objArgments[2]));
     obj = new BezierSurface(writer, parseInt(objArgments[0]), parseInt(objArgments[1]), parseInt(objArgments[2]), parseInt(objArgments[3]), parseInt(objArgments[4]));
+    
   }
 
   println(objName);

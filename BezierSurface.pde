@@ -21,40 +21,50 @@ class BezierSurface extends Obj {
   float bottom;
 
 
-//output STLFile
+  //output STLFile
   String Bottom = "";
   String[][][] strData;
   Mesher mesher;
+  int W;
+  int D;
 
 
-
-  BezierSurface(PrintWriter _writer, int resolution, int Width, int Depth, float _Height, float _weight) {
+  BezierSurface(PrintWriter _writer, int resolution, int _Width, int _Depth, float _Height, float _weight) {
     super(_writer);
     mesher = new Mesher();
-    
+
 
     this.Height = _Height;
+    this.W = _Width;
+    this.D = _Depth;
 
 
-    P[0][0] = new PVector(-Width/2, 40, Depth/2);
-    P[0][1] = new PVector(-Width/2, 0, Depth/6);
-    P[0][2] = new PVector(-Width/2, 0, -Depth/6);
-    P[0][3] = new PVector(-Width/2, 40, -Depth/2);
 
-    P[1][0] = new PVector(-Width/6, 0, Depth/2);
-    P[1][1] = new PVector(-Width/6, -40, Depth/6);
-    P[1][2] = new PVector(-Width/6, -40, -Depth/6);
-    P[1][3] = new PVector(-Width/6, 0, -Depth/2);
+    P[0][0] = new PVector(-W/2, 40, D/2);
+    println("P[0][0]:" + P[0][0]);
+    println("W:" + W);
+    println("_Width : " + _Width);
+    println("D:" + D);
+    println("_Depth : " + _Depth);
 
-    P[2][0] = new PVector(Width/6, 0, Depth/2);
-    P[2][1] = new PVector(Width/6, -40, Depth/6);
-    P[2][2] = new PVector(Width/6, -40, -Depth/6);
-    P[2][3] = new PVector(Width/6, 0, -Depth/2);
+    P[0][1] = new PVector(-W/2, 0, D/6);
+    P[0][2] = new PVector(-W/2, 0, -D/6);
+    P[0][3] = new PVector(-W/2, 40, -D/2);
 
-    P[3][0] = new PVector(Width/2, 40, Depth/2);
-    P[3][1] = new PVector(Width/2, 0, Depth/6);
-    P[3][2] = new PVector(Width/2, 0, -Depth/6);
-    P[3][3] = new PVector(Width/2, 40, -Depth/2);
+    P[1][0] = new PVector(-W/6, 0, D/2);
+    P[1][1] = new PVector(-W/6, -40, D/6);
+    P[1][2] = new PVector(-W/6, -40, -D/6);
+    P[1][3] = new PVector(-W/6, 0, -D/2);
+
+    P[2][0] = new PVector(W/6, 0, D/2);
+    P[2][1] = new PVector(W/6, -40, D/6);
+    P[2][2] = new PVector(W/6, -40, -D/6);
+    P[2][3] = new PVector(W/6, 0, -D/2);
+
+    P[3][0] = new PVector(W/2, 40, D/2);
+    P[3][1] = new PVector(W/2, 0, D/6);
+    P[3][2] = new PVector(W/2, 0, -D/6);
+    P[3][3] = new PVector(W/2, 40, -D/2);
 
     this.bottom = _Height + 40;
     Bottom = mesher.double2e(bottom);
@@ -81,15 +91,28 @@ class BezierSurface extends Obj {
 
     un = resolution;
     vn = resolution;
-    strData = new String[un][vn][3];
 
+    strData = new String[un+1][vn+1][3];
     S = new PVector[un+1][vn+1];
-    for (int i=0; i<un+1; i++) 
-      for (int j=0; j<vn+1; j++)
+
+    for (int i=0; i<un+1; i++) { 
+      for (int j=0; j<vn+1; j++) {
         S[i][j] = new PVector();
+        strData[i][j][0] = new String("");
+        strData[i][j][1] = new String("");
+        strData[i][j][2] = new String("");
+      }
+    }
+
 
 
     makePoint(color(0));
+    println("bezier construct");
+    for (int i=0; i<un+1; i++) {
+      for (int j=0; j<vn+1; j++) {
+        println(S[i][j]);
+      }
+    }
   }
 
 
@@ -245,11 +268,13 @@ class BezierSurface extends Obj {
 
 
   void setStrData() {
-    for (int i=0; i<vn; i++) {
-      for (int j=0; j<un; j++) {
+    for (int i=0; i<vn+1; i++) {
+      for (int j=0; j<un+1; j++) {
         strData[i][j][0] = mesher.double2e(S[i][j].x);
         strData[i][j][1] = mesher.double2e(S[i][j].y);
         strData[i][j][2] = mesher.double2e(S[i][j].z);
+        println(S[i][j].x);
+        println(strData[i][j][0]);
       }
     }
   }
@@ -258,142 +283,142 @@ class BezierSurface extends Obj {
 
   void outputSTLFile() {
     setStrData();
+    println("ok");
 
 
     super.writer.println("solid Object");
-  
+
     //bottom Face
     mesher.facet(super.writer, zero, plus, zero);
-    mesher.vertex3(super.writer, strData[0][0][0], Bottom, strData[0][0][2], strData[vn-1][0][0], Bottom, strData[vn-1][0][2], strData[0][vn-1][0], Bottom, strData[0][vn-1][2]);
+    mesher.vertex3(super.writer, strData[0][0][0], Bottom, strData[0][0][2], strData[vn][0][0], Bottom, strData[vn][0][2], strData[0][vn][0], Bottom, strData[0][vn][2]);
     mesher.facet(super.writer, zero, plus, zero);
-    mesher.vertex3(super.writer, strData[vn-1][0][0], Bottom, strData[vn-1][0][2], strData[0][vn-1][0], Bottom, strData[0][vn-1][2], strData[vn-1][vn-1][0], Bottom, strData[vn-1][vn-1][2]);
+    mesher.vertex3(super.writer, strData[vn][0][0], Bottom, strData[vn][0][2], strData[0][vn][0], Bottom, strData[0][vn][2], strData[vn][vn][0], Bottom, strData[vn][vn][2]);
 
-   
+    println("ok1");
 
     //4 side faces
-    for (int i=1; i<vn; i++) {
-      
+    for (int i=1; i<vn+1; i++) {
+      println(i);
+      println(strData[0][0]);
 
-        //one
-        PVector vtxx[][] = new PVector[2][2];
-        vtxx[0][0] = new PVector(int(strData[0][i-1][0]), int(strData[0][i-1][1]), int(strData[0][i-1][2]));
-        vtxx[0][1] = new PVector(int(strData[0][i-1][0]), int(Bottom), int(strData[0][i-1][2]));
-        vtxx[1][0] = new PVector(int(strData[0][i][0]), int(strData[0][i][1]), int(strData[0][i][2]));
-        vtxx[1][1] = new PVector(int(strData[0][i][0]), int(Bottom), int(strData[0][i][2]));
+      //one
+      PVector vtxx[][] = new PVector[2][2];
+      vtxx[0][0] = new PVector(int(strData[0][i-1][0]), int(strData[0][i-1][1]), int(strData[0][i-1][2]));
+      vtxx[0][1] = new PVector(int(strData[0][i-1][0]), int(Bottom), int(strData[0][i-1][2]));
+      vtxx[1][0] = new PVector(int(strData[0][i][0]), int(strData[0][i][1]), int(strData[0][i][2]));
+      vtxx[1][1] = new PVector(int(strData[0][i][0]), int(Bottom), int(strData[0][i][2]));
 
-        PVector nor1 = mesher.normalVec(vtxx[0][0], vtxx[0][1], vtxx[1][0]);
-        PVector nor2 = mesher.normalVec(vtxx[1][0], vtxx[0][1], vtxx[1][1]);
+      PVector nor1 = mesher.normalVec(vtxx[0][0], vtxx[0][1], vtxx[1][0]);
+      PVector nor2 = mesher.normalVec(vtxx[1][0], vtxx[0][1], vtxx[1][1]);
 
-        String nml[][] = new String[2][3];
-        nml[0][0] = str(nor1.x);
-        nml[0][1] = str(nor1.y);
-        nml[0][2] = str(nor1.z);
+      String nml[][] = new String[2][3];
+      nml[0][0] = str(nor1.x);
+      nml[0][1] = str(nor1.y);
+      nml[0][2] = str(nor1.z);
 
-        nml[1][0] = str(nor2.x);
-        nml[1][1] = str(nor2.y);
-        nml[1][2] = str(nor2.z);
+      nml[1][0] = str(nor2.x);
+      nml[1][1] = str(nor2.y);
+      nml[1][2] = str(nor2.z);
 
-        mesher.facet(super.writer, nml[0][0], nml[0][1], nml[0][2]);
-        mesher.vertex3(super.writer, strData[0][i-1][0], strData[0][i-1][1], strData[0][i-1][2], strData[0][i-1][0], Bottom, strData[0][i-1][2], strData[0][i][0], strData[0][i][1], strData[0][i][2]);
+      mesher.facet(super.writer, nml[0][0], nml[0][1], nml[0][2]);
+      mesher.vertex3(super.writer, strData[0][i-1][0], strData[0][i-1][1], strData[0][i-1][2], strData[0][i-1][0], Bottom, strData[0][i-1][2], strData[0][i][0], strData[0][i][1], strData[0][i][2]);
 
-        mesher.facet(super.writer, nml[1][0], nml[1][1], nml[1][2]);
-        mesher.vertex3(super.writer, strData[0][i-1][0], Bottom, strData[0][i-1][2], strData[0][i][0], strData[0][i][1], strData[0][i][2], strData[0][i][0], Bottom, strData[0][i][2]);
+      mesher.facet(super.writer, nml[1][0], nml[1][1], nml[1][2]);
+      mesher.vertex3(super.writer, strData[0][i-1][0], Bottom, strData[0][i-1][2], strData[0][i][0], strData[0][i][1], strData[0][i][2], strData[0][i][0], Bottom, strData[0][i][2]);
     }
-    for(int i=1; i<vn; i++){
-      
-      
-        //two
-        PVector vtxx[][] = new PVector[2][2];
-        vtxx[0][0] = new PVector(int(strData[i-1][0][0]), int(strData[i-1][0][1]), int(strData[i-1][0][2]));
-        vtxx[0][1] = new PVector(int(strData[i-1][0][0]), int(Bottom), int(strData[i-1][0][2]));
-        vtxx[1][0] = new PVector(int(strData[i][0][0]), int(strData[i][0][1]), int(strData[i][0][2]));
-        vtxx[1][1] = new PVector(int(strData[i][0][0]), int(Bottom), int(strData[i][0][2]));
+    println("ok2");
+    for (int i=1; i<vn+1; i++) {
 
-        PVector nor1 = mesher.normalVec(vtxx[0][0], vtxx[0][1], vtxx[1][0]);
-        PVector nor2 = mesher.normalVec(vtxx[1][0], vtxx[0][1], vtxx[1][1]);
 
-        String nml[][] = new String[2][3];
-        nml[0][0] = str(nor1.x);
-        nml[0][1] = str(nor1.y);
-        nml[0][2] = str(nor1.z);
+      //two
+      PVector vtxx[][] = new PVector[2][2];
+      vtxx[0][0] = new PVector(int(strData[i-1][0][0]), int(strData[i-1][0][1]), int(strData[i-1][0][2]));
+      vtxx[0][1] = new PVector(int(strData[i-1][0][0]), int(Bottom), int(strData[i-1][0][2]));
+      vtxx[1][0] = new PVector(int(strData[i][0][0]), int(strData[i][0][1]), int(strData[i][0][2]));
+      vtxx[1][1] = new PVector(int(strData[i][0][0]), int(Bottom), int(strData[i][0][2]));
 
-        nml[1][0] = str(nor2.x);
-        nml[1][1] = str(nor2.y);
-        nml[1][2] = str(nor2.z);
-        
-        mesher.facet(super.writer, nml[0][0], nml[0][1], nml[0][2]);
-        mesher.vertex3(super.writer, strData[i-1][0][0], strData[i-1][0][1], strData[i-1][0][2], strData[i-1][0][0], Bottom, strData[i-1][0][2], strData[i][0][0], strData[i][0][1], strData[i][0][2]);
-        
-        mesher.facet(super.writer, nml[1][0], nml[1][1], nml[1][2]);
-        mesher.vertex3(super.writer, strData[i][0][0], strData[i][0][1], strData[i][0][2], strData[i-1][0][0], Bottom, strData[i-1][0][2], strData[i][0][0], Bottom, strData[i][0][2]);
+      PVector nor1 = mesher.normalVec(vtxx[0][0], vtxx[0][1], vtxx[1][0]);
+      PVector nor2 = mesher.normalVec(vtxx[1][0], vtxx[0][1], vtxx[1][1]);
+
+      String nml[][] = new String[2][3];
+      nml[0][0] = str(nor1.x);
+      nml[0][1] = str(nor1.y);
+      nml[0][2] = str(nor1.z);
+
+      nml[1][0] = str(nor2.x);
+      nml[1][1] = str(nor2.y);
+      nml[1][2] = str(nor2.z);
+
+      mesher.facet(super.writer, nml[0][0], nml[0][1], nml[0][2]);
+      mesher.vertex3(super.writer, strData[i-1][0][0], strData[i-1][0][1], strData[i-1][0][2], strData[i-1][0][0], Bottom, strData[i-1][0][2], strData[i][0][0], strData[i][0][1], strData[i][0][2]);
+
+      mesher.facet(super.writer, nml[1][0], nml[1][1], nml[1][2]);
+      mesher.vertex3(super.writer, strData[i][0][0], strData[i][0][1], strData[i][0][2], strData[i-1][0][0], Bottom, strData[i-1][0][2], strData[i][0][0], Bottom, strData[i][0][2]);
     }
 
-      
-      
-    for(int i=1; i<vn; i++){
-       //third
-        PVector vtxx[][] = new PVector[2][2];
-        vtxx[0][0] = new PVector(int(strData[vn-1][i-1][0]), int(strData[vn-1][i-1][1]), int(strData[vn-1][i-1][2]));
-        vtxx[0][1] = new PVector(int(strData[vn-1][i-1][0]), int(Bottom), int(strData[vn-1][i-1][2]));
-        vtxx[1][0] = new PVector(int(strData[vn-1][i][0]), int(strData[vn-1][i][1]), int(strData[vn-1][i][2]));
-        vtxx[1][1] = new PVector(int(strData[vn-1][i][0]), int(Bottom), int(strData[vn-1][i][2]));
 
-        PVector nor1 = mesher.normalVec(vtxx[0][0], vtxx[0][1], vtxx[1][0]);
-        PVector nor2 = mesher.normalVec(vtxx[1][0], vtxx[0][1], vtxx[1][1]);
 
-        String nml[][] = new String[2][3];
-        nml[0][0] = str(nor1.x);
-        nml[0][1] = str(nor1.y);
-        nml[0][2] = str(nor1.z);
+    for (int i=1; i<vn+1; i++) {
+      //third
+      PVector vtxx[][] = new PVector[2][2];
+      vtxx[0][0] = new PVector(int(strData[vn][i-1][0]), int(strData[vn][i-1][1]), int(strData[vn][i-1][2]));
+      vtxx[0][1] = new PVector(int(strData[vn][i-1][0]), int(Bottom), int(strData[vn][i-1][2]));
+      vtxx[1][0] = new PVector(int(strData[vn][i][0]), int(strData[vn][i][1]), int(strData[vn][i][2]));
+      vtxx[1][1] = new PVector(int(strData[vn][i][0]), int(Bottom), int(strData[vn][i][2]));
 
-        nml[1][0] = str(nor2.x);
-        nml[1][1] = str(nor2.y);
-        nml[1][2] = str(nor2.z);
-        
-        mesher.facet(super.writer, nml[0][0], nml[0][1], nml[0][2]);
-        mesher.vertex3(super.writer, strData[vn-1][i-1][0], strData[vn-1][i-1][1], strData[vn-1][i-1][2],  strData[vn-1][i-1][0], Bottom, strData[vn-1][i-1][2], strData[vn-1][i][0], strData[vn-1][i][1], strData[vn-1][i][2]);
-        
-        mesher.facet(super.writer, nml[1][0], nml[1][1], nml[1][2]);
-        mesher.vertex3(super.writer, strData[vn-1][i-1][0], Bottom, strData[vn-1][i-1][2], strData[vn-1][i][0], strData[vn-1][i][1], strData[vn-1][i][2], strData[vn-1][i][0], Bottom, strData[vn-1][i][2]);
+      PVector nor1 = mesher.normalVec(vtxx[0][0], vtxx[0][1], vtxx[1][0]);
+      PVector nor2 = mesher.normalVec(vtxx[1][0], vtxx[0][1], vtxx[1][1]);
+
+      String nml[][] = new String[2][3];
+      nml[0][0] = str(nor1.x);
+      nml[0][1] = str(nor1.y);
+      nml[0][2] = str(nor1.z);
+
+      nml[1][0] = str(nor2.x);
+      nml[1][1] = str(nor2.y);
+      nml[1][2] = str(nor2.z);
+
+      mesher.facet(super.writer, nml[0][0], nml[0][1], nml[0][2]);
+      mesher.vertex3(super.writer, strData[vn][i-1][0], strData[vn][i-1][1], strData[vn][i-1][2], strData[vn][i-1][0], Bottom, strData[vn][i-1][2], strData[vn][i][0], strData[vn][i][1], strData[vn][i][2]);
+
+      mesher.facet(super.writer, nml[1][0], nml[1][1], nml[1][2]);
+      mesher.vertex3(super.writer, strData[vn][i-1][0], Bottom, strData[vn][i-1][2], strData[vn][i][0], strData[vn][i][1], strData[vn][i][2], strData[vn][i][0], Bottom, strData[vn][i][2]);
     }
-    
-    for(int i=1; i<vn; i++){
+
+    for (int i=1; i<vn+1; i++) {
       //fourth
-        PVector vtxx[][] = new PVector[2][2];
-        vtxx[0][0] = new PVector(int(strData[i-1][vn-1][0]), int(strData[i-1][vn-1][1]), int(strData[i-1][vn-1][2]));
-        vtxx[0][1] = new PVector(int(strData[i-1][vn-1][0]), int(Bottom), int(strData[i-1][vn-1][2]));
-        vtxx[1][0] = new PVector(int(strData[i][vn-1][0]), int(strData[i][vn-1][1]), int(strData[i][vn-1][2]));
-        vtxx[1][1] = new PVector(int(strData[i][vn-1][0]), int(Bottom), int(strData[i][vn-1][2]));
+      PVector vtxx[][] = new PVector[2][2];
+      vtxx[0][0] = new PVector(int(strData[i-1][vn][0]), int(strData[i-1][vn][1]), int(strData[i-1][vn][2]));
+      vtxx[0][1] = new PVector(int(strData[i-1][vn][0]), int(Bottom), int(strData[i-1][vn][2]));
+      vtxx[1][0] = new PVector(int(strData[i][vn][0]), int(strData[i][vn][1]), int(strData[i][vn][2]));
+      vtxx[1][1] = new PVector(int(strData[i][vn][0]), int(Bottom), int(strData[i][vn][2]));
 
-        PVector nor1 = mesher.normalVec(vtxx[0][0], vtxx[0][1], vtxx[1][0]);
-        PVector nor2 = mesher.normalVec(vtxx[1][0], vtxx[0][1], vtxx[1][1]);
+      PVector nor1 = mesher.normalVec(vtxx[0][0], vtxx[0][1], vtxx[1][0]);
+      PVector nor2 = mesher.normalVec(vtxx[1][0], vtxx[0][1], vtxx[1][1]);
 
-        String nml[][] = new String[2][3];
-        nml[0][0] = str(nor1.x);
-        nml[0][1] = str(nor1.y);
-        nml[0][2] = str(nor1.z);
+      String nml[][] = new String[2][3];
+      nml[0][0] = str(nor1.x);
+      nml[0][1] = str(nor1.y);
+      nml[0][2] = str(nor1.z);
 
-        nml[1][0] = str(nor2.x);
-        nml[1][1] = str(nor2.y);
-        nml[1][2] = str(nor2.z);
-        
-        
-        mesher.facet(super.writer, nml[0][0], nml[0][1], nml[0][2]);
-        mesher.vertex3(super.writer, strData[i-1][vn-1][0], strData[i-1][vn-1][1], strData[i-1][vn-1][2], strData[i-1][vn-1][0], Bottom, strData[i-1][vn-1][2], strData[i][vn-1][0], strData[i][vn-1][1], strData[i][vn-1][2]);
-        
-        mesher.facet(super.writer, nml[1][0], nml[1][1], nml[1][2]);
-        mesher.vertex3(super.writer, strData[i-1][vn-1][0], Bottom, strData[i-1][vn-1][2], strData[i][vn-1][0], strData[i][vn-1][1], strData[i][vn-1][2], strData[i][vn-1][0], Bottom, strData[i][vn-1][2]);
-        
-      
-        
+      nml[1][0] = str(nor2.x);
+      nml[1][1] = str(nor2.y);
+      nml[1][2] = str(nor2.z);
+
+
+      mesher.facet(super.writer, nml[0][0], nml[0][1], nml[0][2]);
+      mesher.vertex3(super.writer, strData[i-1][vn][0], strData[i-1][vn][1], strData[i-1][vn][2], strData[i-1][vn][0], Bottom, strData[i-1][vn][2], strData[i][vn][0], strData[i][vn][1], strData[i][vn][2]);
+
+      mesher.facet(super.writer, nml[1][0], nml[1][1], nml[1][2]);
+      mesher.vertex3(super.writer, strData[i-1][vn][0], Bottom, strData[i-1][vn][2], strData[i][vn][0], strData[i][vn][1], strData[i][vn][2], strData[i][vn][0], Bottom, strData[i][vn][2]);
     }
-      
- 
+
+
 
     //top face
 
-    for (int i=1; i<un; i++) {
-      for (int j=1; j<un; j++) {
+    for (int i=1; i<un+1; i++) {
+      for (int j=1; j<un+1; j++) {
 
         PVector vtxx[][] = new PVector[2][2];
         vtxx[0][0] = new PVector(int(strData[i-1][j][0]), int(strData[i-1][j][1]), int(strData[i-1][j][2]));

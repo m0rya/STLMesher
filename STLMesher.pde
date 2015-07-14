@@ -98,7 +98,10 @@ class Mesher {
       Ans += "E+0" + str(double2eCount);
 
       return Ans;
-    } else if (num < -10) {
+    } else if(num == -10){
+      String Ans = "-1.000000E+01";
+      return Ans;
+    }else if (num < -10) {
       while ( num < -10) {
         num /= 10;
         double2eCount++;
